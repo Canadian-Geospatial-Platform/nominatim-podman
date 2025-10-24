@@ -28,6 +28,16 @@ else
   echo "Skipping optional Wikipedia importance import"
 fi;
 
+if [ "$IMPORT_WIKIPEDIA_SECONDARY" = "true" ]; then
+  echo "Downloading Wikipedia secondary importance dump"
+  ${SCP}:wikimedia-importance-secondary.sql.gz ${PROJECT_DIR}/wikimedia-importance-secondary.sql.gz
+elif [ -f "$IMPORT_WIKIPEDIA_SECONDARY" ]; then
+  # use local file if asked
+  ln -s "$IMPORT_WIKIPEDIA_SECONDARY" ${PROJECT_DIR}/wikimedia-importance-secondary.csv.gz
+else
+  echo "Skipping optional Wikipedia secondary importance import"
+fi;
+
 if [ "$IMPORT_GB_POSTCODES" = "true" ]; then
   ${SCP}:gb_postcodes.csv.gz ${PROJECT_DIR}/gb_postcodes.csv.gz
 elif [ -f "$IMPORT_GB_POSTCODES" ]; then
