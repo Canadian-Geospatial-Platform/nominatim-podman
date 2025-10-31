@@ -5,8 +5,8 @@ docker run -it \
   #Sets the flatnode file, which is to reduce the load on the database when you plan to use multiple countries together bigger than 6GB
   #and highly recommended if you want to import the World!
   -v nominatim-flatnode:/nominatim/flatnode \
-  
-  #PostgreSQL Tuning, without the need to edit the .conf after the setup (Nominatim default recommended values)  
+
+  #PostgreSQL Tuning, without the need to edit the .conf after the setup (Nominatim default recommended values)
   -e POSTGRES_SHARED_BUFFERS=2GB \
   -e POSTGRES_MAINTENANCE_WORK_MEM=10GB \
   -e POSTGRES_AUTOVACUUM_WORK_MEM=2GB \
@@ -28,7 +28,7 @@ docker run -it \
   -e REPLICATION_UPDATE_INTERVAL=43200
 
   #How long to sleep if no update found yet (in seconds, default: 900). Requires REPLICATION_URL to be set.
-  -e REPLICATION_RECHECK_INTERVAL=450 
+  -e REPLICATION_RECHECK_INTERVAL=450
 
   #Configures the way the map files will be updated (default: none)
   -e UPDATE_MODE=continuous/once/catch-up/none
@@ -62,7 +62,7 @@ docker run -it \
   #Sets the used threads at the import (default 16)
   -e THREADS=10 \
 
-  #Sets the Docker tmpfs. Highly recommended for bigger imports like Europe. At least 1GB - ideally half of the available RAM. 
+  #Sets the Docker tmpfs. Highly recommended for bigger imports like Europe. At least 1GB - ideally half of the available RAM.
   --shm-size=60g \
 
   #The password to connect to the database with (default: qaIACxO6wMR3)
@@ -75,5 +75,5 @@ docker run -it \
   --name nominatim \
 
   #Here you choose the Docker image and version
-  mediagis/nominatim:5.1 
+  mediagis/nominatim:5.2
 ```

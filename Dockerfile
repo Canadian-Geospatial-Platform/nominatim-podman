@@ -1,4 +1,4 @@
-ARG NOMINATIM_VERSION=5.1.0
+ARG NOMINATIM_VERSION=5.2.0
 ARG USER_AGENT=Canadian-Geospatial-Platform/nominatim-podman:${NOMINATIM_VERSION}
 
 FROM ubuntu:24.04 AS build
