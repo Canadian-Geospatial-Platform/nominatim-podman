@@ -29,6 +29,7 @@ RUN  \
         -o APT::Install-Suggests="false" \
         # Build tools from sources. \
         build-essential \
+        ca-certificates \
         osm2pgsql \
         pkg-config \
         libicu-dev \

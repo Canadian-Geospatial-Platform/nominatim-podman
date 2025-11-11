@@ -21,6 +21,9 @@ stopServices() {
 }
 trap stopServices SIGTERM TERM INT
 
+# Include local CA certificate(s) that the user may provide
+update-ca-certificates
+
 /app/config.sh
 
 if id nominatim >/dev/null 2>&1; then
