@@ -1,0 +1,74 @@
+diff --git a/lib-lua/themes/nominatim/init.lua b/lib-lua/themes/nominatim/init.lua
+index 8720a631..8583c487 100644
+--- a/nominatim_db/resources/lib-lua/themes/nominatim/init.lua
++++ b/nominatim_db/resources/lib-lua/themes/nominatim/init.lua
+@@ -635,6 +635,12 @@ function module.process_way(object)
+ end
+ 
+ function module.process_relation(object)
++    if object.id == 1206310 then
++        object.tags.name = 'Lake Ontario'
++        object.tags['name:en'] = 'Lake Ontario'
++        object.tags['official_name:en-US'] = nil
++    end
++
+     local geom_func = module.RELATION_TYPES[object.tags.type]
+ 
+     if geom_func ~= nil then
+diff --git a/settings/search-exclusions.yaml b/settings/search-exclusions.yaml
+new file mode 100644
+index 00000000..df257625
+--- /dev/null
++++ b/nominatim_api/resources/settings/search-exclusions.yaml
+@@ -0,0 +1,10 @@
++lake america:
++  - R1206310
++lac america:
++  - R1206310
++america lake:
++  - R1206310
++america lac:
++  - R1206310
++america:
++  - R1206310
+diff --git a/src/nominatim_api/search/geocoder.py b/src/nominatim_api/search/geocoder.py
+index 3b039342..f5bae937 100644
+--- a/nominatim_api/search/geocoder.py
++++ b/nominatim_api/search/geocoder.py
+@@ -34,6 +34,7 @@ class ForwardGeocoder:
+         self.params = params
+         self.timeout = timeout
+         self.query_analyzer: Optional[AbstractQueryAnalyzer] = None
++        self.search_exclusions = conn.config.load_sub_configuration('search-exclusions.yaml')
+ 
+     @property
+     def limit(self) -> int:
+@@ -124,6 +125,20 @@ class ForwardGeocoder:
+ 
+         return results
+ 
++    def filter_search_exclusions(self, query: QueryStruct,
++                                 results: SearchResults) -> SearchResults:
++        """Remove configured OSM objects from exact query matches."""
++        query_text = ' '.join(phrase.text for phrase in query.source).casefold()
++        query_text = ' '.join(query_text.split())
++        excluded = self.search_exclusions.get(query_text, [])
++        if not excluded:
++            return results
++
++        excluded_objects = {(obj[0].upper(), int(obj[1:]))
++                            for obj in excluded if len(obj) > 1 and obj[1:].isdigit()}
++        return SearchResults(result for result in results
++                             if result.osm_object not in excluded_objects)
++
+     def sort_and_cut_results(self, results: SearchResults) -> SearchResults:
+         """ Remove badly matching results, sort by ranking and
+             limit to the configured number of results.
+@@ -220,6 +235,7 @@ class ForwardGeocoder:
+         if searches:
+             # Execute SQL until an appropriate result is found.
+             results = await self.execute_searches(query, searches[:50])
++            results = self.filter_search_exclusions(query, results)
+             results = self.pre_filter_results(results)
+             await add_result_details(self.conn, results, self.params)
+             log().result_dump('Preliminary Results', ((r.accuracy, r) for r in results))

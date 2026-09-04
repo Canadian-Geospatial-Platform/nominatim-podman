@@ -64,6 +64,11 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked pip install --brea
     gunicorn \
     nominatim-api
 
+# Patch Nominatim for R1206310 (Lake Ontario)
+COPY contrib/R1206310.patch /tmp/R1206310.patch
+RUN SITE_PACKAGES=$(python3 -c "import site; print(site.getsitepackages()[0])") && \
+    patch -p1 -d "$SITE_PACKAGES" -i /tmp/R1206310.patch && \
+    rm /tmp/R1206310.patch
 
 # remove build-only packages
 RUN true \
